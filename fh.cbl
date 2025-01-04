@@ -23,13 +23,13 @@
        01 WS-FINAL-GRADE        PIC X(5). 
        01 WS-TEMP-LINE          PIC X(80).
        01 WS-OUTPUT-LINE        PIC X(80).                        
-       01 WS-FINAL-GRADE-STRING PIC X(5).
        01 EOF-FLAG              PIC X VALUE "N".
 
        PROCEDURE DIVISION.
        MAIN-PROCEDURE.
            PERFORM DISPLAY-MENU
            PERFORM UNTIL WS-MENU-CHOICE = 4
+               PERFORM CLEAR-SCREEN
                EVALUATE WS-MENU-CHOICE
                    WHEN 1
                        PERFORM GET-CONSENT
@@ -38,7 +38,7 @@
                    WHEN 3
                        PERFORM DISPLAY-STUDENT-INFORMATION
                    WHEN 4
-                       DISPLAY "Exiting program..."
+                       DISPLAY "Exiting program... Thank you!"
                        STOP RUN
                    WHEN OTHER
                        DISPLAY "Invalid choice. Please try again."
@@ -47,20 +47,24 @@
            END-PERFORM.
            STOP RUN.
 
-              DISPLAY-MENU.
+       DISPLAY-MENU.
            DISPLAY "========================================"
-           DISPLAY "||          MAIN MENU                || "
+           DISPLAY "||          MAIN MENU                ||"
            DISPLAY "========================================"
-           DISPLAY "|| 1. Consent to share information   || "
-           DISPLAY "|| 2. Create Student Profile         || "
-           DISPLAY "|| 3. Display Student Information    || "
-           DISPLAY "|| 4. Exit                           || "
+           DISPLAY "|| 1. Consent to share information   ||"
+           DISPLAY "|| 2. Create Student Profile         ||"
+           DISPLAY "|| 3. Display Student Information    ||"
+           DISPLAY "|| 4. Exit                           ||"
            DISPLAY "========================================"
-           DISPLAY "Enter your choice: "NO ADVANCING.
+           DISPLAY "Enter your choice: " NO ADVANCING.
            ACCEPT WS-MENU-CHOICE.
 
+       CLEAR-SCREEN.
+           DISPLAY X"1B" "[2J".  *> Clear the screen using ANSI escape codes
+           DISPLAY X"1B" "[H".   *> Move cursor to top-left corner
+
        GET-CONSENT.
-           DISPLAY "You agree to share your information?: "NO ADVANCING.
+           DISPLAY "You agree to share your information?: " NO ADVANCING.
            ACCEPT WS-CONSENT.
            IF WS-CONSENT = "Y" OR WS-CONSENT = "y"
                DISPLAY "You agreed to share your information."
@@ -68,17 +72,16 @@
                DISPLAY "You did not agree to share your information."
            END-IF.
 
-
        CREATE-STUDENT-PROFILE.
-           DISPLAY "Student Number: "NO ADVANCING.
+           DISPLAY "Student Number: " NO ADVANCING.
            ACCEPT WS-STUDENT-NUMBER.
-           DISPLAY "Student Name: "NO ADVANCING.
+           DISPLAY "Student Name: " NO ADVANCING.
            ACCEPT WS-STUDENT-NAME.
-           DISPLAY "Program: "NO ADVANCING.
+           DISPLAY "Program: " NO ADVANCING.
            ACCEPT WS-STUDENT-PROGRAM.
-           DISPLAY "Year Level: "NO ADVANCING.
+           DISPLAY "Year Level: " NO ADVANCING.
            ACCEPT WS-YEAR-LEVEL.
-           DISPLAY "Final Grade: "NO ADVANCING.
+           DISPLAY "Final Grade: " NO ADVANCING.
            ACCEPT WS-FINAL-GRADE. 
 
            OPEN OUTPUT STUDENT-FILE.
@@ -120,7 +123,8 @@
 
            CLOSE STUDENT-FILE.
 
-           DISPLAY "Student profile saved successfully.".
+           DISPLAY "Student profile saved successfully."
+           .  *> End CREATE-STUDENT-PROFILE paragraph here.
 
        DISPLAY-STUDENT-INFORMATION.
            OPEN INPUT STUDENT-FILE
