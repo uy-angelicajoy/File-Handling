@@ -1,5 +1,5 @@
       ******************************************************************
-      * Author: JAMES MICHAEL
+      * Author: TECHNEWJEANS
       * Date: 1/18/25
       * Purpose: PROJECT [INDEXED FILE HANDLING]
       * Tectonics: cobc
@@ -37,10 +37,10 @@
            01 WS-WAITFORINPUT           PIC X.
 
        PROCEDURE DIVISION.
-           PERFORM MAIN-PROCEDURE.
+           PERFORM MAIN-MENU.
            STOP RUN.
 
-       MAIN-PROCEDURE.
+       MAIN-MENU.
             PERFORM UNTIL WS-EndOfFile = 'Y'
                CALL "SYSTEM" USING "CLS" *> this is for clearing the entirety of the screen #mejares
                DISPLAY "      <PUP-T STUDENT DATABASE >"
@@ -48,7 +48,8 @@
                DISPLAY "1. CREATE STUDENT PROFILE"
                DISPLAY "2. SEARCH STUDENT"
                DISPLAY "3. EXPORT TO READABLE FILE/CSV"
-               DISPLAY "4. EXIT"
+               DISPLAY "4. DISPLAY ALL STUDENTS"
+               DISPLAY "5. EXIT"
                DISPLAY "------------------------------------"
                DISPLAY "Please enter your desired option: " NO ADVANCING.
                ACCEPT WS-OPTION
@@ -57,7 +58,8 @@
                    WHEN 1 PERFORM ADD-STUDENT
                    WHEN 2 PERFORM SEARCH-STUDENT
                    WHEN 3 PERFORM EXPORT-TO-CSV
-                   WHEN 4 MOVE 'Y' TO WS-EndOfFile
+                   WHEN 4 PERFORM DISPLAY-ALL-STUDENTS
+                   WHEN 5 MOVE 'Y' TO WS-EndOfFile
                    WHEN OTHER DISPLAY "INVALID OPTION"
            END-PERFORM.
 
@@ -71,6 +73,15 @@
            DISPLAY " "
            DISPLAY "Enter Student ID: " NO ADVANCING.
            ACCEPT STUD-ID.
+           READ STUDENT-FILE
+               INVALID KEY
+                   CONTINUE 
+               NOT INVALID 
+                   DISPLAY "Student ID Number already exists!"
+                   CLOSE STUDENT-FILE
+                   ACCEPT WS-WAITFORINPUT
+                   EXIT PARAGRAPH
+           END-READ
            DISPLAY "Enter Student Name: " NO ADVANCING.
            ACCEPT STUD-NAME.
            DISPLAY "Enter Program: " NO ADVANCING.
@@ -144,4 +155,29 @@
            CLOSE STUDENT-FILE.
            CLOSE CSV-FILE.
            DISPLAY "Data exported to CSV Successfully!"
+           ACCEPT WS-WAITFORINPUT.
+       DISPLAY-ALL-STUDENTS.
+           OPEN INPUT STUDENT-FILE
+           IF FILESTATUS = "35"
+               DISPLAY "No data found."
+               EXIT PARAGRAPH
+           END-IF.
+           
+           DISPLAY " "
+           DISPLAY "------------------------------------"
+           DISPLAY "       ALL STUDENTS DATABASE"
+           DISPLAY "------------------------------------"
+           PERFORM UNTIL FILESTATUS = "10"
+               READ STUDENT-FILE
+                   AT END
+                       MOVE "10" TO FILESTATUS
+                   NOT AT END
+                       DISPLAY "Student ID: " STUD-ID
+                       DISPLAY "Student Name  : " STUD-NAME
+                       DISPLAY "Program      : " STUD-PROGRAM
+                       DISPLAY "=================================="
+               END-READ
+           END-PERFORM
+
+           CLOSE STUDENT-FILE.
            ACCEPT WS-WAITFORINPUT.
