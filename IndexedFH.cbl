@@ -41,7 +41,7 @@
            STOP RUN.
 
        MAIN-MENU.
-            PERFORM UNTIL WS-EndOfFile = 'Y' *> this is for checking if the user wants to exit the program #mejares
+            PERFORM UNTIL WS-EndOfFile = 'Y'
                CALL "SYSTEM" USING "CLS" *> this is for clearing the entirety of the screen #mejares
                DISPLAY "      <PUP-T STUDENT DATABASE>"
                DISPLAY "------------------------------------"
