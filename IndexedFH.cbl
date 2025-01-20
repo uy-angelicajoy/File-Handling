@@ -34,7 +34,7 @@
            01 FILESTATUS       PIC X(2). 
            01 WS-OPTION        PIC 9. 
            01 WS-EndOfFile     PIC X VALUE 'N'.
-           01 WS-WAITFORINPUT           PIC X.
+           01 WS-WAITFORINPUT  PIC X.
 
        PROCEDURE DIVISION.
            PERFORM MAIN-MENU.
@@ -49,7 +49,8 @@
                DISPLAY "2. SEARCH STUDENT"
                DISPLAY "3. EXPORT TO READABLE FILE/CSV"
                DISPLAY "4. DISPLAY ALL STUDENTS"
-               DISPLAY "5. EXIT"
+               DISPLAY "5. DELETE STUDENT BY ID"
+               DISPLAY "6. EXIT"
                DISPLAY "------------------------------------"
                DISPLAY "Please enter your desired option: " NO ADVANCING.
                ACCEPT WS-OPTION
@@ -59,11 +60,13 @@
                    WHEN 2 PERFORM SEARCH-STUDENT
                    WHEN 3 PERFORM EXPORT-TO-CSV
                    WHEN 4 PERFORM DISPLAY-ALL-STUDENTS
-                   WHEN 5
+                   WHEN 5 PERFORM DELETE-STUDENT
+                   WHEN 6
                        DISPLAY "TERMINATING PROGRAM..."
                        CLOSE STUDENT-FILE *> CLOSE THE FILE BEFORE EXITING #mejares 
                        MOVE 'Y' TO WS-EndOfFile *> this is for exiting the program #mejares
                    WHEN OTHER DISPLAY "INVALID OPTION"
+               END-EVALUATE
            END-PERFORM.
 
        CREATE-STUDENT-PROFILE.
@@ -161,6 +164,7 @@
            CLOSE CSV-FILE.
            DISPLAY "Data exported to CSV Successfully!"
            ACCEPT WS-WAITFORINPUT.
+
        DISPLAY-ALL-STUDENTS.
            OPEN INPUT STUDENT-FILE
            IF FILESTATUS = "35" *> this is for checking if the file exists/filestatus 35 means file not found #mejares 
@@ -189,3 +193,35 @@
 
            CLOSE STUDENT-FILE.
            ACCEPT WS-WAITFORINPUT.
+
+        DELETE-STUDENT.
+           OPEN I-O STUDENT-FILE.
+           DISPLAY " "
+           DISPLAY "Enter Student ID to Delete: " NO ADVANCING.
+           ACCEPT STUD-ID.
+           READ STUDENT-FILE KEY IS STUD-ID
+               INVALID KEY 
+                   DISPLAY " "
+                   DISPLAY "------------------------------------"
+                   DISPLAY "   Student ID not found!"
+                   DISPLAY "------------------------------------"
+                   DISPLAY " "
+                   ACCEPT WS-WAITFORINPUT
+               NOT INVALID KEY 
+                   DELETE STUDENT-FILE
+                   IF FILESTATUS = "00"
+                       DISPLAY " "
+                       DISPLAY "------------------------------------"
+                       DISPLAY "   Student Record Deleted!"
+                       DISPLAY "------------------------------------"
+                       DISPLAY " "
+                   ELSE
+                       DISPLAY " "
+                       DISPLAY "------------------------------------"
+                       DISPLAY "   Error Deleting Record!"
+                       DISPLAY "------------------------------------"
+                       DISPLAY " "
+                   END-IF
+                   ACCEPT WS-WAITFORINPUT
+           END-READ.
+           CLOSE STUDENT-FILE.
